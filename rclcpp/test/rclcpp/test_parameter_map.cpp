@@ -24,6 +24,8 @@
 
 #include "rclcpp/parameter_map.hpp"
 
+#include <rcpputils/scope_exit.hpp>
+
 rcl_params_t *
 make_params(std::vector<std::string> node_names)
 {
@@ -254,6 +256,13 @@ TEST(Test_parameter_map_from, byte_array_param_value)
   make_node_params(c_params, 0, {"byte_array_param"});
   rcl_byte_array_t c_byte_array;
   MAKE_ARRAY_VALUE(c_byte_array, uint8_t, 0xf0, 0xaa);
+  // (CWE-401):Ensure memory is always freed via RCPPUTILS_SCOPE_EXIT
+  RCPPUTILS_SCOPE_EXIT(
+  {
+    c_params->params[0].parameter_values[0].byte_array_value = NULL;
+    FREE_ARRAY_VALUE(c_byte_array);
+    rcl_yaml_node_struct_fini(c_params);
+  });
   c_params->params[0].parameter_values[0].byte_array_value = &c_byte_array;
 
   rclcpp::ParameterMap map = rclcpp::parameter_map_from(c_params);
@@ -263,10 +272,6 @@ TEST(Test_parameter_map_from, byte_array_param_value)
   ASSERT_EQ(2u, byte_array.size());
   EXPECT_EQ(0xf0, byte_array.at(0));
   EXPECT_EQ(0xaa, byte_array.at(1));
-
-  c_params->params[0].parameter_values[0].byte_array_value = NULL;
-  FREE_ARRAY_VALUE(c_byte_array);
-  rcl_yaml_node_struct_fini(c_params);
 }
 
 TEST(Test_parameter_map_from, bool_array_param_value)
@@ -275,6 +280,13 @@ TEST(Test_parameter_map_from, bool_array_param_value)
   make_node_params(c_params, 0, {"bool_array_param"});
   rcl_bool_array_t c_bool_array;
   MAKE_ARRAY_VALUE(c_bool_array, bool, true, false);
+  // (CWE-401):Ensure memory is always freed via RCPPUTILS_SCOPE_EXIT
+  RCPPUTILS_SCOPE_EXIT(
+  {
+    c_params->params[0].parameter_values[0].bool_array_value = NULL;
+    FREE_ARRAY_VALUE(c_bool_array);
+    rcl_yaml_node_struct_fini(c_params);
+  });
   c_params->params[0].parameter_values[0].bool_array_value = &c_bool_array;
 
   rclcpp::ParameterMap map = rclcpp::parameter_map_from(c_params);
@@ -284,10 +296,6 @@ TEST(Test_parameter_map_from, bool_array_param_value)
   ASSERT_EQ(2u, bool_array.size());
   EXPECT_TRUE(bool_array.at(0));
   EXPECT_FALSE(bool_array.at(1));
-
-  c_params->params[0].parameter_values[0].bool_array_value = NULL;
-  FREE_ARRAY_VALUE(c_bool_array);
-  rcl_yaml_node_struct_fini(c_params);
 }
 
 TEST(Test_parameter_map_from, integer_array_param_value)
@@ -296,6 +304,13 @@ TEST(Test_parameter_map_from, integer_array_param_value)
   make_node_params(c_params, 0, {"integer_array_param"});
   rcl_int64_array_t c_integer_array;
   MAKE_ARRAY_VALUE(c_integer_array, int64_t, 42, -12345);
+  // (CWE-401):Ensure memory is always freed via RCPPUTILS_SCOPE_EXIT
+  RCPPUTILS_SCOPE_EXIT(
+  {
+    c_params->params[0].parameter_values[0].integer_array_value = NULL;
+    FREE_ARRAY_VALUE(c_integer_array);
+    rcl_yaml_node_struct_fini(c_params);
+  });
   c_params->params[0].parameter_values[0].integer_array_value = &c_integer_array;
 
   rclcpp::ParameterMap map = rclcpp::parameter_map_from(c_params);
@@ -305,10 +320,6 @@ TEST(Test_parameter_map_from, integer_array_param_value)
   ASSERT_EQ(2u, integer_array.size());
   EXPECT_EQ(42, integer_array.at(0));
   EXPECT_EQ(-12345, integer_array.at(1));
-
-  c_params->params[0].parameter_values[0].integer_array_value = NULL;
-  FREE_ARRAY_VALUE(c_integer_array);
-  rcl_yaml_node_struct_fini(c_params);
 }
 
 TEST(Test_parameter_map_from, double_array_param_value)
@@ -317,6 +328,13 @@ TEST(Test_parameter_map_from, double_array_param_value)
   make_node_params(c_params, 0, {"double_array_param"});
   rcl_double_array_t c_double_array;
   MAKE_ARRAY_VALUE(c_double_array, double, 3.14, -2.718);
+  // (CWE-401):Ensure memory is always freed via RCPPUTILS_SCOPE_EXIT
+  RCPPUTILS_SCOPE_EXIT(
+  {
+    c_params->params[0].parameter_values[0].double_array_value = NULL;
+    FREE_ARRAY_VALUE(c_double_array);
+    rcl_yaml_node_struct_fini(c_params);
+  });
   c_params->params[0].parameter_values[0].double_array_value = &c_double_array;
 
   rclcpp::ParameterMap map = rclcpp::parameter_map_from(c_params);
@@ -326,10 +344,6 @@ TEST(Test_parameter_map_from, double_array_param_value)
   ASSERT_EQ(2u, double_array.size());
   EXPECT_DOUBLE_EQ(3.14, double_array.at(0));
   EXPECT_DOUBLE_EQ(-2.718, double_array.at(1));
-
-  c_params->params[0].parameter_values[0].double_array_value = NULL;
-  FREE_ARRAY_VALUE(c_double_array);
-  rcl_yaml_node_struct_fini(c_params);
 }
 
 TEST(Test_parameter_map_from, string_array_param_value)

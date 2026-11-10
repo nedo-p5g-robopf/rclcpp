@@ -240,7 +240,10 @@ TEST(TestSerializedMessage, failed_init_throws) {
   auto ret = rmw_serialized_message_init(&rcl_serialized_msg, 13, &default_allocator);
   ASSERT_EQ(RCL_RET_OK, ret);
   EXPECT_EQ(13u, rcl_serialized_msg.buffer_capacity);
-  rcl_serialized_msg.buffer_capacity = -1;
+  // (CWE-195): Type Mismatch: Negative to Unsigned
+  // Instead of assigning -1 (signed int) to size_t (unsigned type), as an invalid value,
+  // convert to same type explicitly and solve the issue related to CWE-195.
+  rcl_serialized_msg.buffer_capacity = static_cast<size_t>(-1);
   EXPECT_THROW(
     {rclcpp::SerializedMessage serialized_msg_fail_2(rcl_serialized_msg);},
     rclcpp::exceptions::RCLBadAlloc);
