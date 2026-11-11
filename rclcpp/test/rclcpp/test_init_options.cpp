@@ -97,8 +97,12 @@ TEST(TestInitOptions, constructor_rcl_init_options_copy_failed) {
   rcl_init_options_t rcl_opts;
   auto mock = mocking_utils::patch_and_return(
     "lib:rclcpp", rcl_init_options_copy, RCL_RET_ERROR);
+  // CWE-401 To prevent potential memory leaks
+  // in case of exceptions during initialization,
+  // We wrapped it with a smart pointer.
+  std::unique_ptr<rclcpp::InitOptions> target;
   RCLCPP_EXPECT_THROW_EQ(
-    new rclcpp::InitOptions(rcl_opts),
+    target.reset(new rclcpp::InitOptions(rcl_opts)),
     std::runtime_error("failed to copy rcl init options: error not set"));
 }
 

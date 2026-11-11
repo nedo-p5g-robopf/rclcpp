@@ -169,7 +169,10 @@ TEST_F(TestLoggingMacros, test_logging_function) {
 }
 
 TEST_F(TestLoggingMacros, test_logging_skipfirst) {
-  for (uint32_t i : {1, 2, 3, 4, 5}) {
+  // (CWE-195): Type Mismatch: Signed to Unsigned
+  // Instead of assigning signed int to unsigned int implicitly,
+  // convert to same type explicitly and solve the issue related to CWE-195.
+  for (uint32_t i : {1u, 2u, 3u, 4u, 5u}) {
     RCLCPP_WARN_SKIPFIRST(g_logger, "message %u", i);
     EXPECT_EQ(i - 1, g_log_calls);
   }
